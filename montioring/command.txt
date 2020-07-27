@@ -1,0 +1,7 @@
+oc create secret generic ldap-secret
+--from-literal=bindPassword=<customer provide> -n openshift-config
+
+oc create configmap ca-config-map
+--from-file=ca.crt=/path/to/ca -n openshift-config (optional)
+
+oc create -f oauth.yaml
