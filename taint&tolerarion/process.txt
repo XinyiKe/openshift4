@@ -1,0 +1,58 @@
+oc adm taint nodes mssocpnprdinf01.maybank-my.mbb.dir role=infra:NoExecute
+https://docs.google.com/document/d/1EJA9OtS1oYNUNKHN-ilOnBVQMsjri9vFOnqtX_zkIaM/edit?ts=5f4e588a#
+
+Adding tolerations to monitoring pods
+# ./oc -n openshift-monitoring edit configmap cluster-monitoring-config
+ 
+apiVersion: v1
+data:
+  config.yaml: |
+    alertmanagerMain:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    prometheusK8s:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    prometheusOperator:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    grafana:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    k8sPrometheusAdapter:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    kubeStateMetrics:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
+    telemeterClient:
+      nodeSelector:
+        infra: prom
+      tolerations:
+      - effect: NoExecute
+        key: role
+        value: infra
