@@ -1,0 +1,41 @@
+https://docs.openshift.com/container-platform/4.4/operators/olm-restricted-networks.html
+Building an Operator catalog image
+On your bastion node hosting the mirror registry, perform a podman login
+# podman login esbintsvrdapp1.telkomsel.co.id:6000 -u tsel -p redhat
+
+Build a catalog image based on the redhat-operators catalog from quay.io, tagging and pushing it to your mirror registry
+# oc adm catalog build \
+--appregistry-org redhat-operators \
+--from=registry.redhat.io/openshift4/ose-operator-registry:v4.4
+--to=esbintsvrdapp1.telkomsel.co.id:6000/olm/redhat-operators:v1 \
+-a /root/ocp4/pull-secret-edited.txt \
+--insecure
+
+
+Configuring OperatorHub for restricted networks
+Disable the default Operator Sources. This disables the default OperatorSources that are configured by default during an OpenShift Container Platform installation.
+# oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+
+Mirror the contents of your catalog to your target registry. The following oc adm catalog mirror command extracts the contents of your custom Operator catalog image to generate the manifests
+required for mirroring and mirrors the images to your registry
+# oc adm catalog mirror \
+esbintsvrdapp1.telkomsel.co.id:6000/olm/redhat-operators:v1 \
+esbintsvrdapp1.telkomsel.co.id:6000 \
+-a /root/ocp4/pull-secret-edited.txt \
+--insecure
+
+This command also creates a <image_name>-manifests/ directory in the current directory
+# oc apply -f ./redhat-operators-manifests
+Create a CatalogSource object that references your catalog image
+# vi catalogsource.yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: my-operator-catalog
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: esbintsvrdapp1.telkomsel.co.id:6000/olm/redhat-operators:v1
+  displayName: My Operator Catalog
+  publisher: grpc
+# oc create -f catalogsource.yaml
