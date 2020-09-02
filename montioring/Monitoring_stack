@@ -1,0 +1,6 @@
+Monitoring stack
+https://docs.openshift.com/container-platform/4.4/monitoring/cluster_monitoring/configuring-the-monitoring-stack.html
+
+Create cluster-monitoring-config ConfigMap object if it does not exists
+$ oc -n openshift-monitoring create configmap cluster-monitoring-config
+$ oc create -f cluster-monitoring-configmap.yaml
